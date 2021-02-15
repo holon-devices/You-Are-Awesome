@@ -6,59 +6,89 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ViewController: UIViewController {
     @IBOutlet weak var messageLabel: UILabel!
     @IBOutlet weak var imageView: UIImageView!
-    
-    var imageNumber = 0
-    var messageNumber = 0
+    @IBOutlet weak var playSoundSwitch: UISwitch!
+    var imageNumber = -1
+    var messageNumber = -1
+    var soundNumber = -1
     var totalNumberOfImages = 9
+    var audioPlayer: AVAudioPlayer!
+    let totalNumberOfSounds = 6
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
+    func playSound(name: String) {
+    if let sound = NSDataAsset(name: name) {
+        
+        do {
+            try audioPlayer = AVAudioPlayer(data: sound.data)
+            audioPlayer.play()
+
+        } catch {
+            print(" Error:  \(error.localizedDescription) Could not initialize AudioPlayer object.")
+    }
+        
+    
+    } else {
+        print(" Error: Could not read data from file sound0")
+    }
+    
+
+  
+}
+
 
     @IBAction func messageButtonPressed(_ sender: UIButton) {
         
         var messages = ["You are Awesome!", "You are great!", "You are fantastic", "Fabulous? That's you", "When the genius bar needs help they call you", "You got the design skills of Johnny Ive"]
         
-//        messageLabel.text = messages[messageNumber]
-//        messageNumber += 1
-//        if messageNumber == messages.count {
-//            messageNumber = 0
-//        }
-        messageLabel.text = messages[Int.random(in: 0 ... messages.count-1)]
-        imageView.image = UIImage(named: "image\(Int.random(in: 0...totalNumberOfImages))")
-//        print(imageNumber)
-//        //let imageName = "image" + String(imageNumber)
-//        let imageName = "image\(imageNumber)"
-//
-//        imageNumber = imageNumber + 1
-//        if imageNumber == 10 {
-//
-//            imageNumber = 0
-//        }
+        
+        func nonRepeatingRandom(originalNumber: Int, upperBound: Int) -> Int {
+            var newNumber: Int
+            repeat {
+                newNumber = Int.random(in: 0 ... messages.count-1)
+            } while originalNumber == newNumber
+                return newNumber
+        }
+        
+        messageNumber = nonRepeatingRandom(originalNumber: messageNumber, upperBound: messages.count-1)
+        messageLabel.text = messages[messageNumber]
+
+        soundNumber = nonRepeatingRandom(originalNumber: soundNumber, upperBound: totalNumberOfSounds-1)
+    
+        imageNumber = nonRepeatingRandom(originalNumber: imageNumber, upperBound: totalNumberOfImages-1)
+        
+        imageView.image = UIImage(named: "image\(imageNumber)")
         
         
-//        let awesomeMessage =  "You are awesome!"
-//        let greatMessage = "You are great!"
-//        let bombMessage = "You are da bomb!"
-//        if messageLabel.text == awesomeMessage {
-//            messageLabel.text = greatMessage
-//            imageView.image = UIImage(named: "image1")
-//        } else if messageLabel.text == greatMessage {
-//            messageLabel.text = bombMessage
-//            imageView.image = UIImage(named: "image2")
-//        } else {
-//            messageLabel.text = awesomeMessage
-//            imageView.image = UIImage(named: "image0")
-//
-//
-//        }
         
-      
+        if playSoundSwitch.isOn {
+            playSound(name: "sound\(soundNumber)")
+        }
+        
+        
+    
+    }
+    
+    @IBAction func playSoundToggled(_ sender: UISwitch) {
+       
+        if !sender.isOn {
+            if audioPlayer != nil {
+            
+                audioPlayer.stop()
+            
+        }
+    }
+    
+
+
+    
     }
     
 }
